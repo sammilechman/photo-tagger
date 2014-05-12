@@ -18,6 +18,7 @@
 //= require underscore
 //
 //= require_tree ./models
+//= require_tree ./views
 //= require_tree ../templates
 //
 //= require_tree .
@@ -86,11 +87,22 @@
             var newPhoto = new PhotoApp.Photo(photoObject);
             Photo.all.push(newPhoto);
           })
-          callback(Photo.all);
+          callback();
         }
       });
     },
-
   });
+
+  PhotoApp.initialize = function() {
+    Photo.fetchByUserId(CURRENT_USER_ID, function() {
+      var list = new PhotoApp.PhotoListView();
+      var renderedList = list.render();
+      console.log("YOOOOOO");
+      var $contents = $('#content')
+      console.log($contents);
+      $contents.append(renderedList.$el);
+    });
+
+  };
 
 })(this);
