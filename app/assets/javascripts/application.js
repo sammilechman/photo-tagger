@@ -46,8 +46,9 @@
           photo: this.attributes
         },
         success: function (response) {
-          //invoke callback here
           console.log("It created!");
+          Photo.all.push(that);
+          Photo.trigger('addPhoto');
           _.extend(that.attributes, response);
         }
       });
@@ -91,16 +92,34 @@
         }
       });
     },
+
+    _events: {},
+    on: function(eventTitle, callback) {
+      Photo._events[eventTitle] = Photo._events[eventTitle] || [];
+      Photo._events[eventTitle].push(callback)
+    },
+    trigger: function(eventTitle) {
+      var callbacks = Photo._events[eventTitle];
+      var arg = arguments[1];
+
+      callbacks = callbacks || [];
+      callbacks.forEach(function (callback) {
+        callback(arg);
+      });
+    }
   });
 
   PhotoApp.initialize = function() {
     Photo.fetchByUserId(CURRENT_USER_ID, function() {
       var list = new PhotoApp.PhotoListView();
+      var form = new PhotoApp.PhotoFormView();
+
+      var renderedForm = form.render();
       var renderedList = list.render();
-      console.log("YOOOOOO");
       var $contents = $('#content')
-      console.log($contents);
+
       $contents.append(renderedList.$el);
+      $contents.append(renderedForm.$el);
     });
 
   };
